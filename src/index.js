@@ -1,13 +1,12 @@
+import { whileStatement } from "@babel/types";
 import React, { useEffect, useState } from "react";
-import {SafeAreaView, View, FlatList, StyleSheet, Text, StatusBar, Button, TextInput} from 'react-native';
-import Realm, {queryAllTodo, deleteTodo, insertNewTodo} from './repository/todoRepository'
+import {SafeAreaView, View, FlatList, StyleSheet, Text, StatusBar, Button, TextInput, Pressable} from 'react-native';
+import { Header } from "react-native/Libraries/NewAppScreen";
+import  {queryAllTodo, deleteTodo, insertNewTodo} from './repository/todoRepository'
 
 
 export const Home = () => {
-  const realm  = Realm;
-
     const[newValue, setNewValue] = useState("");
-
     const [data, setData] = useState([])
 
       const inserNew = async () => {
@@ -15,7 +14,10 @@ export const Home = () => {
           id: await queryAllTodo().then(response => response.max("id") + 1) || 1,
           name: newValue
         }
-        insertNewTodo(newTodo).then(getData())
+        insertNewTodo(newTodo).then(() =>{
+          getData()
+          setNewValue("")
+        })
       }
 
       const handleDelete = (id ) => {
@@ -45,12 +47,13 @@ export const Home = () => {
           getData()
         }, [])
 
-
         return (
           <SafeAreaView style={styles.container}>
             <View style={styles.addArea}>
                 <TextInput onChangeText={setNewValue} value={newValue} style={styles.input} placeholder={"Nova Tarefa"}></TextInput>
-                <Button  title={"Adicionar"} color={"#008B8B"} onPress={() => inserNew(newValue)} ></Button>
+                <Pressable style={styles.button} onPress={() => inserNew(newValue)} >
+                 <Text style={styles.name}> Adicionar </Text>
+                </Pressable>
             </View>
             <FlatList
               data={data}
@@ -64,7 +67,6 @@ export const Home = () => {
       const styles = StyleSheet.create({
         container: {
           flex: 1,
-          marginTop: StatusBar.currentHeight || 0,
         },
         input: {
             margin: 15,
@@ -84,7 +86,9 @@ export const Home = () => {
           borderRadius: 10,
         },
         name: {
-            fontSize: 20,
+          maxWidth:220,
+          color: 'white',
+          fontSize: 20,
         },
         actions: {
           alignSelf: 'center',
@@ -95,4 +99,10 @@ export const Home = () => {
           position: 'absolute',
           fontSize: 20
         },
+        button: {
+          height: 60,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor:"#008B8B",
+        }
       });
